@@ -1,0 +1,84 @@
+﻿@page "/"
+@page "/login"
+@layout LoginLayout
+@using AppLab.Models
+
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<h3>Login</h3>
+
+<EditForm Model="@loginModel" OnValidSubmit="@HandleLogin">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="usuario">Usuario:</label>
+        <InputText id="usuario" class="form-control" @bind-Value="loginModel.Usuario" />
+    </div>
+    <div class="form-group">
+        <label for="password">Contraseña:</label>
+        <InputText id="password" class="form-control" @bind-Value="loginModel.Password" type="password" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Iniciar sesión</button>
+</EditForm>
+
+@if (loginResult != null)
+{
+    <div class="alert @loginResultCssClass" role="alert">
+        @loginResult.OBSERVACION
+    </div>
+}
+
+@if (showDropdown)
+{
+    <div class="mb-3">
+        <label for="emisor">Emisor:</label>
+        <select @bind="selectedEmisor" class="form-control" id="emisor">
+            <option value="">Seleccione un emisor</option>
+            @foreach (var emisor in emisores)
+            {
+                <option value="@emisor.Codigo">@emisor.NombreEmisor</option>
+            }
+        </select>
+    </div>
+    <button class="btn btn-success" @onclick="HandleEmisorSelection" disabled="@(!CanContinue)">Continuar</button>
+}
+
+@code {
+    private LoginModel loginModel = new LoginModel();
+    private UsuarioResponse loginResult;
+    private string loginResultCssClass => loginResult.OBSERVACION.Contains("EXITOSO") ? "alert-success" : "alert-danger";
+    private int? selectedEmisor;
+    private bool showDropdown;
+    private bool CanContinue => selectedEmisor == loginResult?.Emisor;
+    private List<Emisor> emisores;
+
+    private async Task HandleLogin()
+    {
+        try
+        {
+            var response = await Http.GetFromJsonAsync<UsuarioResponse[]>($"http://apiservicios.ecuasolmovsa.com:3009/api/Usuarios?usuario={loginModel.Usuario}&password={loginModel.Password}");
+            loginResult = response?.FirstOrDefault();
+
+            if (loginResult?.OBSERVACION.Contains("EXITOSO") == true)
+            {
+                emisores = await Http.GetFromJsonAsync<List<Emisor>>("http://apiservicios.ecuasolmovsa.com:3009/api/Varios/GetEmisor");
+                showDropdown = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            loginResult = new UsuarioResponse { OBSERVACION = $"Error de inicio de sesión: {ex.Message}" };
+        }
+    }
+
+    private async Task HandleEmisorSelection()
+    {
+        if (CanContinue)
+        {
+            NavigationManager.NavigateTo($"/dashboard/{selectedEmisor.Value}");
+        }
+    }
+}
