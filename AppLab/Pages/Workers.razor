@@ -1,0 +1,49 @@
+﻿@page "/workers"
+@using AppLab.Models
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<h3>Lista de Trabajadores</h3>
+
+@if (workers == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Apellido Paterno</th>
+                <th>Apellido Materno</th>
+                <th>Nombres</th>
+                <th>Identificación</th>
+                <th>Fecha de Ingreso</th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var worker in workers)
+            {
+                <tr>
+                    <td>@worker.Apellido_Paterno</td>
+                    <td>@worker.Apellido_Materno</td>
+                    <td>@worker.Nombres</td>
+                    <td>@worker.Identificacion</td>
+                    <td>@worker.FechaIngreso.ToString("dd/MM/yyyy")</td>
+                   
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Worker> workers;
+
+    protected override async Task OnInitializedAsync()
+    {
+        int emisorCode = 2; // Este código debería venir del usuario que inició sesión.
+        workers = await Http.GetFromJsonAsync<List<Worker>>($"http://apiservicios.ecuasolmovsa.com:3009/api/Varios/TrabajadorSelect?sucursal={emisorCode}");
+    }
+}
