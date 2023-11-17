@@ -1,0 +1,44 @@
+﻿@page "/tipotrabajadores"
+@inject HttpClient Http
+
+<h3>Tipos de Trabajador</h3>
+
+@if (tiposTrabajador == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var tipo in tiposTrabajador)
+            {
+                <tr>
+                    <td>@tipo.Codigo</td>
+                    <td>@tipo.Descripcion</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<TipoTrabajadorModel> tiposTrabajador;
+
+    protected override async Task OnInitializedAsync()
+    {
+        tiposTrabajador = await Http.GetFromJsonAsync<List<TipoTrabajadorModel>>("http://apiservicios.ecuasolmovsa.com:3009/api/Varios/TipoTrabajador");
+    }
+
+    public class TipoTrabajadorModel
+    {
+        public string Codigo { get; set; }
+        public string Descripcion { get; set; }
+    }
+}

@@ -1,0 +1,44 @@
+﻿@page "/centrocostos"
+@inject HttpClient Http
+
+<h3>Centros de Costos</h3>
+
+@if (centrosCostos == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Nombre del Centro de Costos</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var centro in centrosCostos)
+            {
+                <tr>
+                    <td>@centro.Codigo</td>
+                    <td>@centro.NombreCentroCostos</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<CentroCostosModel> centrosCostos;
+
+    protected override async Task OnInitializedAsync()
+    {
+        centrosCostos = await Http.GetFromJsonAsync<List<CentroCostosModel>>("http://apiservicios.ecuasolmovsa.com:3009/api/Varios/CentroCostosSelect");
+    }
+
+    public class CentroCostosModel
+    {
+        public int Codigo { get; set; }
+        public string NombreCentroCostos { get; set; }
+    }
+}

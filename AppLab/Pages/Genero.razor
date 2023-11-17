@@ -1,0 +1,44 @@
+﻿@page "/genero"
+@inject HttpClient Http
+
+<h3>Géneros</h3>
+
+@if (generos == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var genero in generos)
+            {
+                <tr>
+                    <td>@genero.Codigo</td>
+                    <td>@genero.Descripcion</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<GeneroModel> generos;
+
+    protected override async Task OnInitializedAsync()
+    {
+        generos = await Http.GetFromJsonAsync<List<GeneroModel>>("http://apiservicios.ecuasolmovsa.com:3009/api/Varios/Genero");
+    }
+
+    public class GeneroModel
+    {
+        public string Codigo { get; set; }
+        public string Descripcion { get; set; }
+    }
+}
