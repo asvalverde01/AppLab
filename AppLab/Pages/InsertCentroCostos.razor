@@ -1,0 +1,53 @@
+﻿@page "/insertcentrocostos"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<h3>Insertar Centro de Costos</h3>
+
+<EditForm Model="@centroCostosModel" OnValidSubmit="@HandleInsert">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="codigo">Código del Centro de Costos:</label>
+        <InputNumber id="codigo" class="form-control" @bind-Value="centroCostosModel.Codigo" />
+    </div>
+    <div class="form-group">
+        <label for="descripcion">Descripción del Centro de Costos:</label>
+        <InputText id="descripcion" class="form-control" @bind-Value="centroCostosModel.NombreCentroCostos" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Insertar</button>
+</EditForm>
+
+@if (insertResponse != null)
+{
+    <div class="alert alert-success" role="alert">
+        @insertResponse.Mensaje
+    </div>
+}
+
+@code {
+    private CentroCostosModel centroCostosModel = new CentroCostosModel();
+    private CentroCostosModel insertResponse;
+
+    private async Task HandleInsert()
+    {
+        var response = await Http.PostAsJsonAsync($"http://apiservicios.ecuasolmovsa.com:3009/api/Varios/CentroCostosInsert?codigocentrocostos={centroCostosModel.Codigo}&descripcioncentrocostos={centroCostosModel.NombreCentroCostos}", new { });
+        if (response.IsSuccessStatusCode)
+        {
+            insertResponse = await response.Content.ReadFromJsonAsync<CentroCostosModel>();
+        }
+        else
+        {
+            insertResponse = new CentroCostosModel { Mensaje = "Error al insertar el centro de costos" };
+        }
+    }
+
+    public class CentroCostosModel
+    {
+        public int? Codigo { get; set; }
+        public string NombreCentroCostos { get; set; }
+        public string Mensaje { get; set; }
+    }
+}

@@ -43,7 +43,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        int emisorCode = 2; // Este código debería venir del usuario que inició sesión.
+        int emisorCode = 2; 
         workers = await Http.GetFromJsonAsync<List<Worker>>($"http://apiservicios.ecuasolmovsa.com:3009/api/Varios/TrabajadorSelect?sucursal={emisorCode}");
     }
 }

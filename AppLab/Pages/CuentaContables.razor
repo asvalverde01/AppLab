@@ -1,0 +1,58 @@
+﻿@page "/cuentacontables"
+@inject HttpClient Http
+
+<PageTitle>Cuenta Contable</PageTitle>
+
+<h3>Cuentas Contables</h3>
+
+@if (cuentasContables == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Descripción Concepto</th>
+                <th>Descripción Categoría</th>
+                <th>Código Cuenta Contable</th>
+                <th>Descripción Cuenta</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cuenta in cuentasContables)
+            {
+                <tr>
+                    <td>@cuenta.DescripcionConcepto</td>
+                    <td>@cuenta.DescripcionCategoria</td>
+                    <td>@cuenta.CodigoCuentaContable</td>
+                    <td>@cuenta.DescripcionCuenta</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<CuentaContable> cuentasContables;
+
+    protected override async Task OnInitializedAsync()
+    {
+        cuentasContables = await Http.GetFromJsonAsync<List<CuentaContable>>("http://apiservicios.ecuasolmovsa.com:3009/api/Varios/Gestion_Cuenta_Contable_Nomina_Select?Sucursal=2");
+    }
+
+    public class CuentaContable
+    {
+        public int Sucursal { get; set; }
+        public int CodigoConceptoNomina { get; set; }
+        public string DescripcionConcepto { get; set; }
+        public int CodigoCategoriaocupacional { get; set; }
+        public string DescripcionCategoria { get; set; }
+        public string CodigoOperacion { get; set; }
+        public double CodigoCuentaContable { get; set; }
+        public string CodigoTipoCuenta { get; set; }
+        public string DescripcionCuenta { get; set; }
+        public string Mensaje { get; set; }
+    }
+}

@@ -1,0 +1,77 @@
+﻿@page "/movimientoplanilla"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<h3>Movimiento Planilla</h3>
+
+<button class="btn btn-primary" @onclick="CreateNewMovement">Crear Nuevo Movimiento</button>
+
+
+@code {
+    private void CreateNewMovement()
+    {
+        NavigationManager.NavigateTo("createmovimientoplanilla");
+    }
+}
+
+@if (movimientosPlanilla != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Código Concepto</th>
+                <th>Concepto</th>
+                <th>Prioridad</th>
+                <th>Tipo Operación</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var movimiento in movimientosPlanilla)
+            {
+                <tr>
+                    <td>@movimiento.CodigoConcepto</td>
+                    <td>@movimiento.Concepto</td>
+                    <td>@movimiento.Prioridad</td>
+                    <td>@movimiento.TipoOperacion</td>
+                    <td>
+                        <button class="btn btn-secondary" @onclick="EditarMovimiento">Editar</button>
+                        <button class="btn btn-danger" @onclick="() => EliminarMovimiento(movimiento.CodigoConcepto)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p><em>Cargando...</em></p>
+}
+
+@code {
+    private List<MovimientoPlanillaModel> movimientosPlanilla;
+
+    protected override async Task OnInitializedAsync()
+    {
+        movimientosPlanilla = await Http.GetFromJsonAsync<List<MovimientoPlanillaModel>>("http://apiservicios.ecuasolmovsa.com:3009/api/Varios/MovimientoPlanillaSelect");
+    }
+
+    private void EditarMovimiento()
+    {
+        NavigationManager.NavigateTo("/editmovimientoplanilla");
+    }
+
+
+    private void EliminarMovimiento(int codigoConcepto)
+    {
+        //TODO
+    }
+
+    public class MovimientoPlanillaModel
+    {
+        public int CodigoConcepto { get; set; }
+        public string Concepto { get; set; }
+        public int Prioridad { get; set; }
+        public string TipoOperacion { get; set; }
+    }
+}
