@@ -1,0 +1,90 @@
+﻿@page "/insertarcuentacontable"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<PageTitle>Insertar Cuenta Contable</PageTitle>
+
+<h3>Insertar Nueva Cuenta Contable</h3>
+
+<EditForm Model="@nuevaCuentaContable" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <!-- Campos del formulario -->
+    <div class="form-group">
+        <label for="Sucursal">Sucursal:</label>
+        <InputNumber id="Sucursal" class="form-control" @bind-Value="nuevaCuentaContable.Sucursal" />
+    </div>
+    <div class="form-group">
+        <label for="CodigoConceptoNomina">Código Concepto Nómina:</label>
+        <InputNumber id="CodigoConceptoNomina" class="form-control" @bind-Value="nuevaCuentaContable.CodigoConceptoNomina" />
+    </div>
+    <div class="form-group">
+        <label for="DescripcionConcepto">Descripción del Concepto:</label>
+        <InputText id="DescripcionConcepto" class="form-control" @bind-Value="nuevaCuentaContable.DescripcionConcepto" />
+    </div>
+    <div class="form-group">
+        <label for="CodigoCategoriaocupacional">Código Categoría Ocupacional:</label>
+        <InputNumber id="CodigoCategoriaocupacional" class="form-control" @bind-Value="nuevaCuentaContable.CodigoCategoriaocupacional" />
+    </div>
+    <div class="form-group">
+        <label for="DescripcionCategoria">Descripción Categoría:</label>
+        <InputText id="DescripcionCategoria" class="form-control" @bind-Value="nuevaCuentaContable.DescripcionCategoria" />
+    </div>
+    <div class="form-group">
+        <label for="CodigoOperacion">Código Operación:</label>
+        <InputText id="CodigoOperacion" class="form-control" @bind-Value="nuevaCuentaContable.CodigoOperacion" />
+    </div>
+    <div class="form-group">
+        <label for="CodigoCuentaContable">Código Cuenta Contable:</label>
+        <InputNumber id="CodigoCuentaContable" class="form-control" @bind-Value="nuevaCuentaContable.CodigoCuentaContable" />
+    </div>
+    <div class="form-group">
+        <label for="CodigoTipoCuenta">Código Tipo Cuenta:</label>
+        <InputText id="CodigoTipoCuenta" class="form-control" @bind-Value="nuevaCuentaContable.CodigoTipoCuenta" />
+    </div>
+    <div class="form-group">
+        <label for="DescripcionCuenta">Descripción Cuenta:</label>
+        <InputText id="DescripcionCuenta" class="form-control" @bind-Value="nuevaCuentaContable.DescripcionCuenta" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Insertar</button>
+</EditForm>
+
+@if (mensajeRespuesta != null)
+{
+    <div class="alert alert-info">@mensajeRespuesta</div>
+}
+
+@code {
+    private CuentaContable nuevaCuentaContable = new CuentaContable();
+    private string mensajeRespuesta;
+
+    private async Task HandleValidSubmit()
+    {
+        var response = await Http.PostAsJsonAsync("http://apiservicios.ecuasolmovsa.com:3009/api/Varios/GestionContableNominaInsert", nuevaCuentaContable);
+        if (response.IsSuccessStatusCode)
+        {
+            mensajeRespuesta = "Cuenta contable insertada con éxito.";
+            NavigationManager.NavigateTo("/cuentacontable");
+        }
+        else
+        {
+            mensajeRespuesta = "Error al insertar la cuenta contable.";
+        }
+    }
+
+    public class CuentaContable
+    {
+        public int Sucursal { get; set; }
+        public int CodigoConceptoNomina { get; set; }
+        public string DescripcionConcepto { get; set; }
+        public int CodigoCategoriaocupacional { get; set; }
+        public string DescripcionCategoria { get; set; }
+        public string CodigoOperacion { get; set; }
+        public double CodigoCuentaContable { get; set; }
+        public string CodigoTipoCuenta { get; set; }
+        public string DescripcionCuenta { get; set; }
+        public string Mensaje { get; set; }
+    }
+}
