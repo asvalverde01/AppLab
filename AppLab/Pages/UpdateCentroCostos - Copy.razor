@@ -72,15 +72,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Aquí debes cargar los datos del movimiento que deseas editar
-        // Por ejemplo, podrías obtener el ID de alguna manera y luego hacer una solicitud HTTP para obtener los datos
+
     }
 
     private async Task HandleValidSubmit()
     {
         var response = await Http.PostAsJsonAsync("http://apiservicios.ecuasolmovsa.com:3009/api/Varios/MovimientoPlanillaUpdate", movimientoPlanilla);
         var responseContent = await response.Content.ReadFromJsonAsync<ResponseModel>();
-        // Manejar la respuesta, por ejemplo, mostrar un mensaje o redirigir
     }
 
     public class MovimientoPlanilla

@@ -7,6 +7,5 @@
         public string OBSERVACION { get; set; }
         public int Emisor { get; set; }
         public string NOMBREEMISOR { get; set; }
-        // Agrega el resto de las propiedades según la respuesta de la API.
     }
 }
