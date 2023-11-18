@@ -1,9 +1,17 @@
 ﻿@page "/cuentacontables"
 @inject HttpClient Http
+@inject NavigationManager NavigationManager  // Inject NavigationManager
 
 <PageTitle>Cuenta Contable</PageTitle>
 
 <h3>Cuentas Contables</h3>
+
+<button class="btn btn-primary" @onclick="CreateNewMovement">Crear Nueva cuenta contable</button>
+
+@code {
+    public void CreateNewMovement() => NavigationManager.NavigateTo("insertcentrocostos");
+}
+
 
 @if (cuentasContables == null)
 {
@@ -55,4 +63,5 @@ else
         public string DescripcionCuenta { get; set; }
         public string Mensaje { get; set; }
     }
+
 }
