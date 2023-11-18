@@ -1,0 +1,44 @@
+﻿@page "/decimotercerodecimocuarto"
+@inject HttpClient Http
+
+<h3>Décimo Tercero y Cuarto</h3>
+
+@if (decimoTerceroDecimoCuarto == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in decimoTerceroDecimoCuarto)
+            {
+                <tr>
+                    <td>@item.Codigo</td>
+                    <td>@item.Descripcion</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<DecimoTerceroDecimoCuartoModel> decimoTerceroDecimoCuarto;
+
+    protected override async Task OnInitializedAsync()
+    {
+        decimoTerceroDecimoCuarto = await Http.GetFromJsonAsync<List<DecimoTerceroDecimoCuartoModel>>("http://apiservicios.ecuasolmovsa.com:3009/api/Varios/DecimoTerceroDecimoCuarto");
+    }
+
+    public class DecimoTerceroDecimoCuartoModel
+    {
+        public string Codigo { get; set; }
+        public string Descripcion { get; set; }
+    }
+}

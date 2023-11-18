@@ -1,0 +1,44 @@
+﻿@page "/categoriaocupacional"
+@inject HttpClient Http
+
+<h3>Categoría Ocupacional</h3>
+
+@if (categoriasOcupacionales == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in categoriasOcupacionales)
+            {
+                <tr>
+                    <td>@item.Codigo</td>
+                    <td>@item.Descripcion</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<CategoriaOcupacionalModel> categoriasOcupacionales;
+
+    protected override async Task OnInitializedAsync()
+    {
+        categoriasOcupacionales = await Http.GetFromJsonAsync<List<CategoriaOcupacionalModel>>("http://apiservicios.ecuasolmovsa.com:3009/api/Varios/CategoriaOcupacional");
+    }
+
+    public class CategoriaOcupacionalModel
+    {
+        public int Codigo { get; set; }
+        public string Descripcion { get; set; }
+    }
+}

@@ -1,0 +1,39 @@
+﻿@page "/periodovacaciones"
+@using AppLab.Models;
+@inject HttpClient Http
+
+<h3>Periodo de Vacaciones</h3>
+
+@if (periodosVacaciones == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var periodo in periodosVacaciones)
+            {
+                <tr>
+                    <td>@periodo.Codigo</td>
+                    <td>@periodo.Descripcion</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<PeriodoVacacionesModel> periodosVacaciones;
+
+    protected override async Task OnInitializedAsync()
+    {
+        periodosVacaciones = await Http.GetFromJsonAsync<List<PeriodoVacacionesModel>>("http://apiservicios.ecuasolmovsa.com:3009/api/Varios/PeriodoVacaciones");
+    }
+}

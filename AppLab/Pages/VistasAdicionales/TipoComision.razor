@@ -1,0 +1,44 @@
+﻿@page "/tipocomision"
+@inject HttpClient Http
+
+<h3>Tipo de Comisión</h3>
+
+@if (tiposComision == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var tipo in tiposComision)
+            {
+                <tr>
+                    <td>@tipo.Codigo</td>
+                    <td>@tipo.Descripcion</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<TipoComisionModel> tiposComision;
+
+    protected override async Task OnInitializedAsync()
+    {
+        tiposComision = await Http.GetFromJsonAsync<List<TipoComisionModel>>("http://apiservicios.ecuasolmovsa.com:3009/api/Varios/TipoComision");
+    }
+
+    public class TipoComisionModel
+    {
+        public string Codigo { get; set; }
+        public string Descripcion { get; set; }
+    }
+}

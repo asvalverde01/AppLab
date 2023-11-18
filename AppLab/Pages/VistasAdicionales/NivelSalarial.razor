@@ -1,0 +1,44 @@
+﻿@page "/nivelsalarial"
+@inject HttpClient Http
+
+<h3>Nivel Salarial</h3>
+
+@if (nivelesSalariales == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in nivelesSalariales)
+            {
+                <tr>
+                    <td>@item.Codigo</td>
+                    <td>@item.Descripcion</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<NivelSalarialModel> nivelesSalariales;
+
+    protected override async Task OnInitializedAsync()
+    {
+        nivelesSalariales = await Http.GetFromJsonAsync<List<NivelSalarialModel>>("http://apiservicios.ecuasolmovsa.com:3009/api/Varios/NivelSalarial");
+    }
+
+    public class NivelSalarialModel
+    {
+        public int Codigo { get; set; }
+        public string Descripcion { get; set; }
+    }
+}

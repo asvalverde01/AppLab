@@ -1,0 +1,44 @@
+﻿@page "/esreingreso"
+@inject HttpClient Http
+
+<h3>Es Reingreso</h3>
+
+@if (esReingreso == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in esReingreso)
+            {
+                <tr>
+                    <td>@item.Codigo</td>
+                    <td>@item.Descripcion</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<EsReingresoModel> esReingreso;
+
+    protected override async Task OnInitializedAsync()
+    {
+        esReingreso = await Http.GetFromJsonAsync<List<EsReingresoModel>>("http://apiservicios.ecuasolmovsa.com:3009/api/Varios/EsReingreso");
+    }
+
+    public class EsReingresoModel
+    {
+        public string Codigo { get; set; }
+        public string Descripcion { get; set; }
+    }
+}

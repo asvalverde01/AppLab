@@ -1,0 +1,44 @@
+﻿@page "/fondoreserva"
+@inject HttpClient Http
+
+<h3>Fondo de Reserva</h3>
+
+@if (fondoReserva == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in fondoReserva)
+            {
+                <tr>
+                    <td>@item.Codigo</td>
+                    <td>@item.Descripcion</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<FondoReservaModel> fondoReserva;
+
+    protected override async Task OnInitializedAsync()
+    {
+        fondoReserva = await Http.GetFromJsonAsync<List<FondoReservaModel>>("http://apiservicios.ecuasolmovsa.com:3009/api/Varios/FondoReserva");
+    }
+
+    public class FondoReservaModel
+    {
+        public string Codigo { get; set; }
+        public string Descripcion { get; set; }
+    }
+}

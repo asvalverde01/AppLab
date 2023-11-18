@@ -1,0 +1,44 @@
+﻿@page "/tipocese"
+@inject HttpClient Http
+
+<h3>Tipo de Cese</h3>
+
+@if (tipoCese == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in tipoCese)
+            {
+                <tr>
+                    <td>@item.Codigo</td>
+                    <td>@item.Descripcion</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<TipoCeseModel> tipoCese;
+
+    protected override async Task OnInitializedAsync()
+    {
+        tipoCese = await Http.GetFromJsonAsync<List<TipoCeseModel>>("http://apiservicios.ecuasolmovsa.com:3009/api/Varios/TipoCese");
+    }
+
+    public class TipoCeseModel
+    {
+        public string Codigo { get; set; }
+        public string Descripcion { get; set; }
+    }
+}

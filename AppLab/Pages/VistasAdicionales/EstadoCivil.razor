@@ -1,0 +1,44 @@
+﻿@page "/estadocivil"
+@inject HttpClient Http
+
+<h3>Estado Civil</h3>
+
+@if (estadoCivil == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in estadoCivil)
+            {
+                <tr>
+                    <td>@item.Codigo</td>
+                    <td>@item.Descripcion</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<EstadoCivilModel> estadoCivil;
+
+    protected override async Task OnInitializedAsync()
+    {
+        estadoCivil = await Http.GetFromJsonAsync<List<EstadoCivilModel>>("http://apiservicios.ecuasolmovsa.com:3009/api/Varios/EstadoCivil");
+    }
+
+    public class EstadoCivilModel
+    {
+        public string Codigo { get; set; }
+        public string Descripcion { get; set; }
+    }
+}

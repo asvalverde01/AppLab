@@ -1,0 +1,44 @@
+﻿@page "/ocupaciones"
+@inject HttpClient Http
+
+<h3>Ocupaciones</h3>
+
+@if (ocupaciones == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in ocupaciones)
+            {
+                <tr>
+                    <td>@item.Codigo</td>
+                    <td>@item.Descripcion</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<OcupacionModel> ocupaciones;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ocupaciones = await Http.GetFromJsonAsync<List<OcupacionModel>>("http://apiservicios.ecuasolmovsa.com:3009/api/Varios/Ocupaciones");
+    }
+
+    public class OcupacionModel
+    {
+        public string Codigo { get; set; }
+        public string Descripcion { get; set; }
+    }
+}
