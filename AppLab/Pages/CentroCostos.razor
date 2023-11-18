@@ -25,8 +25,8 @@ else
                     <td>@centro.Codigo</td>
                     <td>@centro.NombreCentroCostos</td>
                     <td>
-                        <button class="btn btn-primary" @onclick="() => EditarCentroCostos(centro.Codigo)">Editar</button>
-                        <button class="btn btn-danger" @onclick="() => EliminarCentroCostos(centro.Codigo)">Eliminar</button>
+                        <button class="btn btn-primary" @onclick="() => SolicitarAutorizacion(centro.Codigo, true)">Editar</button>
+                        <button class="btn btn-danger" @onclick="() => SolicitarAutorizacion(centro.Codigo, false)">Eliminar</button>
                     </td>
                 </tr>
             }
@@ -42,15 +42,10 @@ else
         centrosCostos = await Http.GetFromJsonAsync<List<CentroCostosModel>>("http://apiservicios.ecuasolmovsa.com:3009/api/Varios/CentroCostosSelect");
     }
 
-    private void EditarCentroCostos(int codigo)
+    private void SolicitarAutorizacion(int codigo, bool esEdicion)
     {
-        // Navegar a la página de edición con el código del centro de costos
-        NavigationManager.NavigateTo($"/updatecentrocostos/{codigo}");
-    }
-
-    private void EliminarCentroCostos(int codigo)
-    {
-        // Implementar la lógica de eliminación aquí
+        var accion = esEdicion ? "editar" : "eliminar";
+        NavigationManager.NavigateTo($"/auth/{codigo}/{accion}");
     }
 
     public class CentroCostosModel

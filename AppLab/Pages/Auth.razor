@@ -1,0 +1,73 @@
+﻿@page "/auth/{Codigo:int}/{Accion}"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<h3>Autenticación</h3>
+
+<div>
+    <input type="text" @bind="usuario" placeholder="Usuario" />
+    <input type="password" @bind="password" placeholder="Contraseña" />
+    <button @onclick="Autenticar">Iniciar Sesión</button>
+</div>
+
+@if (!string.IsNullOrEmpty(mensajeError))
+{
+    <p style="color:red;">@mensajeError</p>
+}
+
+@code {
+    [Parameter]
+    public int Codigo { get; set; }
+
+    [Parameter]
+    public string Accion { get; set; }
+
+    private string usuario;
+    private string password;
+    private string mensajeError;
+
+    private async Task Autenticar()
+    {
+        try
+        {
+            var autorizacion = await Http.GetFromJsonAsync<AutorizacionModel[]>($"http://apiservicios.ecuasolmovsa.com:3009/api/Varios/GetAutorizador?usuario={usuario}&password={password}");
+
+            if (autorizacion != null && autorizacion.Length > 0 && autorizacion[0].OBSERVACION == "INGRESO EXITOSO")
+            {
+                if (Accion == "editar")
+                {
+                    NavigationManager.NavigateTo($"/updatecentrocostos/{Codigo}");
+                }
+                else if (Accion == "eliminar")
+                {
+                    // PendienteImplementar la lógica de eliminación aquí
+                    // NavigationManager.NavigateTo($"/deletecentrocostos/{Codigo}");
+                }
+            }
+            else
+            {
+                mensajeError = "Autenticación fallida. Por favor, intente de nuevo.";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error al autenticar: {ex.Message}";
+        }
+    }
+
+    public class AutorizacionModel
+    {
+        public string NOMBREUSUARIO { get; set; }
+        public string PERFIL { get; set; } 
+        public string OBSERVACION { get; set; }
+        public string CODIGOPERFIL { get; set; } 
+        public string ESTADO { get; set; } 
+        public string COMPANIA { get; set; } 
+        public string Emisor { get; set; }
+        public string Cargo { get; set; } 
+        public string NOMBREEMISOR { get; set; } 
+        public string NOMBRECOMPANIA { get; set; } 
+        public string USUARIOCLIENTE { get; set; } 
+        public string RucUsuario { get; set; } 
+    }
+}
