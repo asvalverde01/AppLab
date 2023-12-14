@@ -23,6 +23,12 @@ else
                 <th>Nombres</th>
                 <th>Identificación</th>
                 <th>Fecha de Ingreso</th>
+                <th>Entidad Bancaria</th>
+                <th>Dirección</th>
+                <th>Teléfono Fijo</th>
+                <th>Teléfono Móvil</th>
+                <th>Genero</th>
+                <!-- Add more headers for additional attributes -->
             </tr>
         </thead>
         <tbody>
@@ -34,6 +40,12 @@ else
                     <td>@worker.Nombres</td>
                     <td>@worker.Identificacion</td>
                     <td>@worker.FechaIngreso.ToString("dd/MM/yyyy")</td>
+                    <td>@worker.Entidad_Bancaria</td>
+                    <td>@worker.Direccion</td>
+                    <td>@worker.Telefono_Fijo</td>
+                    <td>@worker.Telefono_Movil</td>
+                    <td>@worker.Genero</td>
+                    <!-- Add more cells for additional attributes -->
                 </tr>
             }
         </tbody>
@@ -54,26 +66,31 @@ else
         ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
         using (var package = new ExcelPackage())
         {
-            // Set the LicenseContext for this instance of EPPlus
-
             var worksheet = package.Workbook.Worksheets.Add("Trabajadores");
 
             // Headers
-            worksheet.Cells["A1"].Value = "Apellido Paterno";
-            worksheet.Cells["B1"].Value = "Apellido Materno";
+            worksheet.Cells["A1"].Value = "Cedula";
+            worksheet.Cells["B1"].Value = "Tipo Documento";
             worksheet.Cells["C1"].Value = "Nombres";
-            worksheet.Cells["D1"].Value = "Identificación";
-            worksheet.Cells["E1"].Value = "Fecha de Ingreso";
+            worksheet.Cells["D1"].Value = "Apellido Paterno";
+            worksheet.Cells["E1"].Value = "Apellido Materno";
+            worksheet.Cells["F1"].Value = "Genero";
+            worksheet.Cells["G1"].Value = "Salario";
+            // Add more headers for additional attributes
 
             // Data
             for (int i = 0; i < workers.Count; i++)
             {
                 var worker = workers[i];
-                worksheet.Cells[i + 2, 1].Value = worker.Apellido_Paterno;
-                worksheet.Cells[i + 2, 2].Value = worker.Apellido_Materno;
+                worksheet.Cells[i + 2, 1].Value = worker.Identificacion;
+                worksheet.Cells[i + 2, 2].Value = worker.Tipo_trabajador; // Assuming Tipo Documento is stored in Tipo_trabajador
                 worksheet.Cells[i + 2, 3].Value = worker.Nombres;
-                worksheet.Cells[i + 2, 4].Value = worker.Identificacion;
-                worksheet.Cells[i + 2, 5].Value = worker.FechaIngreso.ToString("dd/MM/yyyy");
+                worksheet.Cells[i + 2, 4].Value = worker.Apellido_Paterno;
+                worksheet.Cells[i + 2, 5].Value = worker.Apellido_Materno;
+                worksheet.Cells[i + 2, 6].Value = worker.Genero;
+                worksheet.Cells[i + 2, 7].Value = worker.Remuneracion_Minima;
+
+                // Add more cells for additional attributes
             }
 
             var memoryStream = new MemoryStream(package.GetAsByteArray());
@@ -84,4 +101,5 @@ else
             NavigationManager.NavigateTo($"data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{base64String}", forceLoad: true);
         }
     }
+
 }
