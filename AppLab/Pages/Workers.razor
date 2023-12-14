@@ -2,6 +2,8 @@
 @using AppLab.Models
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
+@using OfficeOpenXml;
+@using System.IO;
 
 <h3>Lista de Trabajadores</h3>
 
@@ -11,6 +13,8 @@
 }
 else
 {
+    <button @onclick="DownloadExcel">Descargar Excel</button>
+
     <table class="table">
         <thead>
             <tr>
@@ -19,7 +23,6 @@ else
                 <th>Nombres</th>
                 <th>Identificación</th>
                 <th>Fecha de Ingreso</th>
-                
             </tr>
         </thead>
         <tbody>
@@ -31,7 +34,6 @@ else
                     <td>@worker.Nombres</td>
                     <td>@worker.Identificacion</td>
                     <td>@worker.FechaIngreso.ToString("dd/MM/yyyy")</td>
-                   
                 </tr>
             }
         </tbody>
@@ -43,7 +45,43 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        int emisorCode = 2; 
+        int emisorCode = 2;
         workers = await Http.GetFromJsonAsync<List<Worker>>($"http://apiservicios.ecuasolmovsa.com:3009/api/Varios/TrabajadorSelect?sucursal={emisorCode}");
+    }
+
+    private void DownloadExcel()
+    {
+        ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+        using (var package = new ExcelPackage())
+        {
+            // Set the LicenseContext for this instance of EPPlus
+
+            var worksheet = package.Workbook.Worksheets.Add("Trabajadores");
+
+            // Headers
+            worksheet.Cells["A1"].Value = "Apellido Paterno";
+            worksheet.Cells["B1"].Value = "Apellido Materno";
+            worksheet.Cells["C1"].Value = "Nombres";
+            worksheet.Cells["D1"].Value = "Identificación";
+            worksheet.Cells["E1"].Value = "Fecha de Ingreso";
+
+            // Data
+            for (int i = 0; i < workers.Count; i++)
+            {
+                var worker = workers[i];
+                worksheet.Cells[i + 2, 1].Value = worker.Apellido_Paterno;
+                worksheet.Cells[i + 2, 2].Value = worker.Apellido_Materno;
+                worksheet.Cells[i + 2, 3].Value = worker.Nombres;
+                worksheet.Cells[i + 2, 4].Value = worker.Identificacion;
+                worksheet.Cells[i + 2, 5].Value = worker.FechaIngreso.ToString("dd/MM/yyyy");
+            }
+
+            var memoryStream = new MemoryStream(package.GetAsByteArray());
+
+            // Descargar el archivo Excel
+            string fileName = "workers.xlsx";
+            var base64String = Convert.ToBase64String(memoryStream.ToArray());
+            NavigationManager.NavigateTo($"data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{base64String}", forceLoad: true);
+        }
     }
 }
