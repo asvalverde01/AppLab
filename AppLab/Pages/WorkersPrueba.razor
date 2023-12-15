@@ -1,0 +1,122 @@
+﻿@page "/workersprueba"
+@using AppLab.Models
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@using OfficeOpenXml;
+@using System.IO;
+
+<h3>Lista de Trabajadores con Cálculos</h3>
+
+@if (workers == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <button @onclick="DownloadExcel">Descargar Excel</button>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombre del Trabajador</th>
+                <th>Cédula</th>
+                <th>SUELDO</th>
+                <th>IESS PATRONAL</th>
+                <th>IESS PERSONAL</th>
+                <th>Total</th>
+                <th>Seleccionar</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var worker in workers)
+            {
+                <tr>
+                    <td>@($"{worker.Nombres} {worker.Apellido_Paterno} {worker.Apellido_Materno}")</td>
+                    <td>@worker.Identificacion</td>
+                    <td>@worker.Remuneracion_Minima.ToString("C")</td>
+                    <td>@CalculateIESSPatronal(worker.Remuneracion_Minima).ToString("C")</td>
+                    <td>@CalculateIESSPersonal(worker.Remuneracion_Minima).ToString("C")</td>
+                    <td>@CalculateTotalPagar(worker.Remuneracion_Minima).ToString("C")</td>
+                    <td><input type="checkbox" @bind="worker.Selected" /></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Worker> workers;
+
+    protected override async Task OnInitializedAsync()
+    {
+        int emisorCode = 2;
+        workers = await Http.GetFromJsonAsync<List<Worker>>($"http://apiservicios.ecuasolmovsa.com:3009/api/Varios/TrabajadorSelect?sucursal={emisorCode}");
+    }
+
+    private void DownloadExcel()
+    {
+        ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+        using (var package = new ExcelPackage())
+        {
+            var worksheet = package.Workbook.Worksheets.Add("Trabajadores");
+
+            // Headers
+            worksheet.Cells["A1"].Value = "Nombre del Trabajador";
+            worksheet.Cells["B1"].Value = "Cédula";
+            worksheet.Cells["C1"].Value = "SUELDO";
+            worksheet.Cells["D1"].Value = "IESS PATRONAL";
+            worksheet.Cells["E1"].Value = "IESS PERSONAL";
+            worksheet.Cells["F1"].Value = "Total";
+            // Add more headers for additional attributes
+
+            // Data
+            int rowIndex = 2;
+            foreach (var worker in workers.Where(w => w.Selected))
+            {
+                worksheet.Cells[rowIndex, 1].Value = $"{worker.Nombres} {worker.Apellido_Paterno} {worker.Apellido_Materno}";
+                worksheet.Cells[rowIndex, 2].Value = worker.Identificacion;
+                worksheet.Cells[rowIndex, 3].Value = worker.Remuneracion_Minima;
+                worksheet.Cells[rowIndex, 4].Value = CalculateIESSPatronal(worker.Remuneracion_Minima);
+                worksheet.Cells[rowIndex, 5].Value = CalculateIESSPersonal(worker.Remuneracion_Minima);
+                worksheet.Cells[rowIndex, 6].Value = CalculateTotalPagar(worker.Remuneracion_Minima);
+                // Add more cells for additional attributes
+                rowIndex++;
+            }
+
+            var memoryStream = new MemoryStream(package.GetAsByteArray());
+
+            // Descargar el archivo Excel
+            string fileName = "workers.xlsx";
+            var base64String = Convert.ToBase64String(memoryStream.ToArray());
+            NavigationManager.NavigateTo($"data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{base64String}", forceLoad: true);
+        }
+    }
+
+    private decimal CalculateIESSPatronal(decimal salario)
+    {
+        // Calculate IESS Patronal (11.15% of the salary)
+        return salario * 0.1115m;
+    }
+
+    private decimal CalculateIESSPersonal(decimal salario)
+    {
+        // Calculate IESS Personal (9.45% of the salary)
+        return salario * 0.0945m;
+    }
+
+    private decimal CalculateTotalPagar(decimal salario)
+    {
+        // Calculate Total to Pay (Salary + IESS Patronal + IESS Personal)
+        return salario + CalculateIESSPatronal(salario) + CalculateIESSPersonal(salario);
+    }
+
+    private class Worker
+    {
+        public string Nombres { get; set; }
+        public string Apellido_Paterno { get; set; }
+        public string Apellido_Materno { get; set; }
+        public string Identificacion { get; set; }
+        public decimal Remuneracion_Minima { get; set; }
+        public bool Selected { get; set; }
+    }
+}
