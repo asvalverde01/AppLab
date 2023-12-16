@@ -13,31 +13,34 @@
 }
 else
 {
+    <button @onclick="ToggleSelectAll">Seleccionar Todos</button>
     <button @onclick="DownloadExcel">Descargar Excel</button>
 
     <table class="table">
         <thead>
             <tr>
+                <th>
+                    <input type="checkbox" @bind="selectAll" />
+                </th>
                 <th>Nombre del Trabajador</th>
                 <th>Cédula</th>
                 <th>SUELDO</th>
                 <th>IESS PATRONAL</th>
                 <th>IESS PERSONAL</th>
                 <th>Total</th>
-                <th>Seleccionar</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var worker in workers)
             {
                 <tr>
+                    <td><input type="checkbox" @bind="worker.Selected" /></td>
                     <td>@($"{worker.Nombres} {worker.Apellido_Paterno} {worker.Apellido_Materno}")</td>
                     <td>@worker.Identificacion</td>
                     <td>@worker.Remuneracion_Minima.ToString("C")</td>
                     <td>@CalculateIESSPatronal(worker.Remuneracion_Minima).ToString("C")</td>
                     <td>@CalculateIESSPersonal(worker.Remuneracion_Minima).ToString("C")</td>
                     <td>@CalculateTotalPagar(worker.Remuneracion_Minima).ToString("C")</td>
-                    <td><input type="checkbox" @bind="worker.Selected" /></td>
                 </tr>
             }
         </tbody>
@@ -46,11 +49,22 @@ else
 
 @code {
     private List<Worker> workers;
+    private bool selectAll = false;
 
     protected override async Task OnInitializedAsync()
     {
         int emisorCode = 2;
         workers = await Http.GetFromJsonAsync<List<Worker>>($"http://apiservicios.ecuasolmovsa.com:3009/api/Varios/TrabajadorSelect?sucursal={emisorCode}");
+    }
+
+    private void ToggleSelectAll()
+    {
+        selectAll = !selectAll;
+
+        foreach (var worker in workers)
+        {
+            worker.Selected = selectAll;
+        }
     }
 
     private void DownloadExcel()
