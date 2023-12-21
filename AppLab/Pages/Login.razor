@@ -37,14 +37,16 @@
         <label for="emisor">Emisor:</label>
         <select @bind="selectedEmisor" class="form-control" id="emisor">
             <option value="">Seleccione un emisor</option>
-            @foreach (var emisor in emisores)
+            @for (int i = 0; i < emisores.Count; i++)
             {
-                <option value="@emisor.Codigo">@emisor.NombreEmisor</option>
+                var emisor = emisores[i];
+                <option value="@emisor.Codigo">@($"{i + 1}. {emisor.NombreEmisor}")</option>
             }
         </select>
     </div>
     <button class="btn btn-success" @onclick="HandleEmisorSelection" disabled="@(!CanContinue)">Continuar</button>
 }
+
 
 @code {
     private LoginModel loginModel = new LoginModel();
