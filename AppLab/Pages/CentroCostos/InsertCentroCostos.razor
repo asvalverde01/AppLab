@@ -33,14 +33,21 @@
 
     private async Task HandleInsert()
     {
-        var response = await Http.PostAsJsonAsync($"http://apiservicios.ecuasolmovsa.com:3009/api/Varios/CentroCostosInsert?codigocentrocostos={centroCostosModel.Codigo}&descripcioncentrocostos={centroCostosModel.NombreCentroCostos}", new { });
-        if (response.IsSuccessStatusCode)
+        try
         {
-            insertResponse = await response.Content.ReadFromJsonAsync<CentroCostosModel>();
+            var response = await Http.PostAsJsonAsync($"http://apiservicios.ecuasolmovsa.com:3009/api/Varios/CentroCostosInsert?codigocentrocostos={centroCostosModel.Codigo}&descripcioncentrocostos={centroCostosModel.NombreCentroCostos}", new { });
+            if (response.IsSuccessStatusCode)
+            {
+                insertResponse = new CentroCostosModel { Mensaje = "Centro de Costos insertado exitosamente." };
+            }
+            else
+            {
+                insertResponse = new CentroCostosModel { Mensaje = "Error al insertar el centro de costos." };
+            }
         }
-        else
+        catch (Exception ex)
         {
-            insertResponse = new CentroCostosModel { Mensaje = "Error al insertar el centro de costos" };
+            insertResponse = new CentroCostosModel { Mensaje = $"Error de inserción: {ex.Message}" };
         }
     }
 

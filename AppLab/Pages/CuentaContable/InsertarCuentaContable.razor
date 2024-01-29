@@ -62,15 +62,30 @@
 
     private async Task HandleValidSubmit()
     {
-        var response = await Http.PostAsJsonAsync("http://apiservicios.ecuasolmovsa.com:3009/api/Varios/GestionContableNominaInsert", nuevaCuentaContable);
-        if (response.IsSuccessStatusCode)
+        try
         {
-            mensajeRespuesta = "Cuenta contable insertada con éxito.";
-            NavigationManager.NavigateTo("/cuentacontable");
+            HttpResponseMessage response = await Http.PostAsync(
+                $"http://apiservicios.ecuasolmovsa.com:3009/api/Varios/GestionContableNominaInsert?" +
+                $"Sucursal={nuevaCuentaContable.Sucursal}" +
+                $"&CodigoConceptoNomina={nuevaCuentaContable.CodigoConceptoNomina}" +
+                $"&CodigoCategoriaocupacional={nuevaCuentaContable.CodigoCategoriaocupacional}" +
+                $"&CodigoOperacion={nuevaCuentaContable.CodigoOperacion}" +
+                $"&CodigoCuenta={nuevaCuentaContable.CodigoCuentaContable}" +
+                $"&CodigoTipoCuenta={nuevaCuentaContable.CodigoTipoCuenta}", null);
+
+            if (response.IsSuccessStatusCode)
+            {
+                mensajeRespuesta = "Cuenta contable insertada con éxito.";
+            }
+            else
+            {
+                mensajeRespuesta = "Error al insertar la cuenta contable, "+"código de estado: " + response.StatusCode;
+            }
         }
-        else
+        catch (Exception ex)
         {
-            mensajeRespuesta = "Error al insertar la cuenta contable.";
+            // Asegurar que cualquier excepción se captura y el programa no se cierre
+            mensajeRespuesta = "Excepción al enviar el request: " + ex.Message;
         }
     }
 

@@ -1,0 +1,58 @@
+﻿@page "/deletecentrocostos/{Codigo:int}"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<h3>Eliminar Centro de Costos</h3>
+
+<EditForm Model="@centroCostosModel" OnValidSubmit="@HandleUpdate">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="descripcion">Descripción del Centro de Costos:</label>
+        <InputText id="descripcion" class="form-control" @bind-Value="centroCostosModel.NombreCentroCostos" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Actualizar</button>
+    <button type="button" class="btn btn-danger" @onclick="HandleDelete">Eliminar</button>
+
+</EditForm>
+
+@if (updateResponse != null)
+{
+    <div class="alert alert-success" role="alert">
+        @updateResponse.NombreCentroCostos
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Codigo { get; set; }
+
+    private CentroCostosModel centroCostosModel = new CentroCostosModel();
+    private CentroCostosModel updateResponse;
+
+    private async Task HandleUpdate()
+    {
+        var response = await Http.GetFromJsonAsync<List<CentroCostosModel>>($"http://apiservicios.ecuasolmovsa.com:3009/api/Varios/CentroCostosUpdate?codigocentrocostos={Codigo}&descripcioncentrocostos={centroCostosModel.NombreCentroCostos}");
+        updateResponse = response?.FirstOrDefault();
+    }
+
+    private async Task HandleDelete()
+    {
+        try
+        {
+            var response = await Http.GetFromJsonAsync<List<CentroCostosModel>>($"http://apiservicios.ecuasolmovsa.com:3009/api/Varios/CentroCostosDelete?codigocentrocostos={Codigo}");
+            updateResponse = response?.FirstOrDefault();
+        }
+        catch (Exception ex)
+        {
+            updateResponse = new CentroCostosModel { NombreCentroCostos = $"Error al eliminar el centro de costos: {ex.Message}" };
+        }
+    }
+
+    public class CentroCostosModel
+    {
+        public string NombreCentroCostos { get; set; }
+    }
+}
